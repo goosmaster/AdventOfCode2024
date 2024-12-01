@@ -1,0 +1,1 @@
+module goosmaster/AdventOfCode2024
