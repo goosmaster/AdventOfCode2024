@@ -8,8 +8,8 @@ import (
 
 type App struct {
 	Name      string
-	Part1Func func() string
-	Part2Func func() string
+	Part1Func func() (string, error)
+	Part2Func func() (string, error)
 }
 
 func main() {
@@ -27,17 +27,26 @@ func main() {
 				if len(arguments) == 2 {
 					part = arguments[1]
 				}
+				var solution string
+				var err error
 				switch part {
 				case "part1", "1":
-					fmt.Println(app.Part1Func())
+					solution, err = app.Part1Func()
 					break
 				case "part2", "2":
-					fmt.Println(app.Part2Func())
+					solution, err = app.Part2Func()
 					break
 				default:
-					fmt.Println(app.Part1Func())
+					solution, err = app.Part1Func()
 					break
 				}
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+
+				fmt.Println(solution)
 			}
 		}
 	}
