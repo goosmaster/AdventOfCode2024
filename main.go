@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goosmaster/AdventOfCode2024/solutions/day01"
 	"goosmaster/AdventOfCode2024/solutions/day02"
+	"goosmaster/AdventOfCode2024/solutions/day03"
 	"os"
 )
 
@@ -17,6 +18,7 @@ func main() {
 	apps := make(map[int32]App, 1)
 	apps[0] = App{"day01", day01.Part1, day01.Part2}
 	apps[1] = App{"day02", day02.Part1, day02.Part2}
+	apps[2] = App{"day03", day03.Part1, day03.Part2}
 
 	arguments := os.Args[1:]
 	found := false
