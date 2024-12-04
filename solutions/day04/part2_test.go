@@ -7,14 +7,25 @@ import (
 )
 
 func TestPart2(t *testing.T) {
-	const input = `xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))`
-
-	const expectedResult = 48
-	result, err := solvePart2(bufio.NewReader(bytes.NewBuffer([]byte(input))))
-	if err != nil {
-		t.Errorf("got err: %v", err)
+	testCases := []struct {
+		name           string
+		input          string
+		expectedResult uint32
+	}{
+		{"example", ".M.S......\n..A..MSMS.\n.M.S.MAA..\n..A.ASMSM.\n.M.S.M....\n..........\nS.S.S.S.S.\n.A.A.A.A..\nM.M.M.M.M.\n..........", 9},
+		{"mini example", "M.S\n.A.\nM.S", 1},
 	}
-	if result != expectedResult {
-		t.Errorf("got %d, expected %d", result, expectedResult)
+
+	t.Parallel()
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			result, err := solvePart2(bufio.NewReader(bytes.NewBuffer([]byte(testCase.input))))
+			if err != nil {
+				t.Errorf("got err: %v", err)
+			}
+			if result != testCase.expectedResult {
+				t.Errorf("got %d, expected %d", result, testCase.expectedResult)
+			}
+		})
 	}
 }

@@ -4,12 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"regexp"
-	"strconv"
 )
 
 func Part2() (string, error) {
-	file, err := os.OpenFile("solutions/day03/input.txt", os.O_RDONLY, 0600)
+	file, err := os.OpenFile("solutions/day04/input.txt", os.O_RDONLY, 0600)
 	if err != nil {
 		return "", err
 	}
@@ -20,34 +18,73 @@ func Part2() (string, error) {
 
 func solvePart2(file *bufio.Reader) (uint32, error) {
 	memoryScanner := bufio.NewScanner(file)
-	total := 0
-	content := ""
+	startBuffered := false
+	total := uint32(0)
+	var lines [][]byte
 	for memoryScanner.Scan() {
-		content += memoryScanner.Text()
+		line := memoryScanner.Bytes()
+		buff := []byte{'.', '.', '.'}
+		line = append(buff, line...)
+		line = append(line, buff...)
+		if startBuffered == false {
+			var bufferedZone []byte
+			for j := 0; j < len(line); j++ {
+				bufferedZone = append(bufferedZone, '.')
+			}
+			for i := 0; i < 3; i++ {
+				lines = append(lines, bufferedZone)
+			}
+			startBuffered = true
+		}
+
+		lines = append(lines, line)
 	}
 
-	re := regexp.MustCompile(`mul\(\d+,\d+\)|do\(\)|don't\(\)`)
-	matches := re.FindAll([]byte(content), -1)
+	var bufferedZone []byte
+	for j := 0; j < len(lines[0]); j++ {
+		bufferedZone = append(bufferedZone, '.')
+	}
+	for i := 0; i < 3; i++ {
+		lines = append(lines, bufferedZone)
+	}
 
-	flag := true
-	for _, match := range matches {
+	total += findX(lines)
 
-		switch string(match) {
-		case "do()":
-			flag = true
-		case "don't()":
-			flag = false
-		default:
-			if flag {
-				numbers := regexp.MustCompile(`\d+`)
-				numberMatches := numbers.FindAll(match, 2)
+	return total, nil
+}
 
-				first, _ := strconv.Atoi(string(numberMatches[0]))
-				second, _ := strconv.Atoi(string(numberMatches[1]))
-				total += first * second
+func findX(lines [][]byte) uint32 {
+	count := uint32(0)
+	for y, line := range lines {
+		for x, character := range line {
+			if character == 'A' {
+				count += constructX(lines, y, x)
 			}
 		}
 	}
+	return count
+}
 
-	return uint32(total), nil
+func constructX(lines [][]byte, y, x int) uint32 {
+	count := uint32(0)
+
+	if lines[y-1][x-1] == 'M' && lines[y+1][x+1] == 'S' && lines[y+1][x-1] == 'M' && lines[y-1][x+1] == 'S' {
+		// from top left to bottom right MAS && from bottom left to top right MAS
+		count++
+	}
+	if lines[y-1][x+1] == 'M' && lines[y+1][x-1] == 'S' && lines[y+1][x+1] == 'M' && lines[y-1][x-1] == 'S' {
+		// from top right to bottom left MAS && from bottom right to top left MAS
+		count++
+	}
+
+	if lines[y+1][x+1] == 'M' && lines[y-1][x-1] == 'S' && lines[y+1][x-1] == 'M' && lines[y-1][x+1] == 'S' {
+		// from bottom right to top left MAS && from bottom left to top right MAS
+		count++
+	}
+	if lines[y-1][x+1] == 'M' && lines[y+1][x-1] == 'S' && lines[y-1][x-1] == 'M' && lines[y+1][x+1] == 'S' {
+		// from top right to bottom left MAS && from top left to bottom right MAS
+		count++
+	}
+
+	return count
 }
